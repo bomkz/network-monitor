@@ -60,3 +60,4 @@ temp/
 local.Dockerfile
 data.db/
 go.sum
+__debug_bin*

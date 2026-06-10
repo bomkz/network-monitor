@@ -19,42 +19,16 @@ Network Monitor can be run on any computer or a Raspberry Pi, requiring minimal 
 ### Prerequisites
 
 - A computer or Raspberry Pi with network access.
-- Docker installed for running InfluxDB in a container.
-- Go installed for running the Network Monitor application.
-
-### Setting Up InfluxDB
-
-InfluxDB is used to store and manage the network metrics captured by Network Monitor. It runs in a Docker container, simplifying deployment and management.
-
-1. Ensure Docker is installed and running on your system.
-2. Use the provided `docker-compose.yml` file to launch InfluxDB:
-
-   ```bash
-   docker-compose up -d influxdb
-   ```
 
 ### Configuration
 
-Before running Network Monitor, configure the connection to InfluxDB through an environment file (`.env`), which is not included in the repository for security reasons. Create this file with the following contents:
+## Building Network Monitor
 
-```plaintext
-INFLUXDB_URL=YourInfluxDBURL #e.g. http://localhost:8086
-INFLUXDB_ADMIN_TOKEN=YourInfluxDBToken
-INFLUXDB_ORG=YourOrganisation
-INFLUXDB_BUCKET=YourBucket
-```
+- Install MSYS2
+- Set up MSYS2 in system/user path
+- Follow https://docs.fyne.io/started/quick/
 
-Replace `YourInfluxDBToken`, `YourOrganisation`, and `YourBucket` with your actual InfluxDB credentials and configuration.
 
-## Running Network Monitor
-
-Use the provided script `run.sh` to build and run the Network Monitor application. Ensure the `.env` file is in the same directory as `run.sh` for the application to read and use the InfluxDB configuration.
-
-```bash
-./run.sh
-```
-
-This script builds the Go application and starts capturing network metrics, sending them to InfluxDB.
 
 ## Conclusion
 

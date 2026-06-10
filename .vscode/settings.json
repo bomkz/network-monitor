@@ -1,0 +1,8 @@
+{"gopls": {
+    
+  "build.directoryFilters": [
+    "-**/fyne.io"
+  ],
+  "ui.diagnostic.staticcheck": false,
+  "build.buildFlags": ["-tags", "nofyne"]
+}}
