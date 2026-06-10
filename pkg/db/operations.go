@@ -1,57 +1,76 @@
 package db
 
 import (
+	"context"
+	"log"
 	"time"
 
 	"github.com/iliasgal/network-monitor/pkg/model"
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/storage"
 )
 
-func WritePingMetricsToInfluxDB(stats *model.PingStats, errorChan chan<- error) {
-	// Get non-blocking write client
-	writeAPI := influxClient.WriteAPI(influxOrg, influxBucket)
+func WritePingMetricsToDB(stats *model.PingStats) {
 
-	p := influxdb2.NewPointWithMeasurement("ping_metrics").
-		AddField("avg_latency_ms", stats.AvgLatency).
-		AddField("jitter_ms", stats.Jitter).
-		AddField("packet_loss", stats.PacketLoss).
-		SetTime(time.Now())
+	ctx := context.Background()
 
-	// write point asynchronously
-	writeAPI.WritePoint(p)
+	// Initiate an append opperation
+	app := tsdbClient.Appender(ctx)
 
-	// Flush writes
-	writeAPI.Flush()
+	p := TSDBPoint{}
+	p.Measurement = "ping_metrics"
+	p.Timestamp = time.Now()
+	p.Fields = map[string]float64{"avg_latency_ms": stats.AvgLatency, "jitter_ms": stats.Jitter, "packet_loss": stats.PacketLoss}
 
-	go func() {
-		for err := range writeAPI.Errors() {
-			errorChan <- err
-		}
-	}()
+	err := WritePoint(app, p)
+	if err != nil {
+		app.Rollback()
+		log.Fatal(err)
+	}
+	app.Commit()
 }
 
-func WritePacketInfoToInfluxDB(info *model.PacketInfo, errorChan chan<- error) {
-	// Get a non-blocking write client
-	writeAPI := influxClient.WriteAPI(influxOrg, influxBucket)
+type TSDBPoint struct {
+	Measurement string
+	Tags        map[string]string
+	Fields      map[string]float64
+	Timestamp   time.Time
+}
 
-	p := influxdb2.NewPointWithMeasurement("network_traffic").
-		AddTag("packet_type", info.PacketType).
-		AddTag("src_ip", info.SrcIP).
-		AddTag("dst_ip", info.DstIP).
-		AddTag("src_port", info.SrcPort).
-		AddTag("dst_port", info.DstPort).
-		AddField("packet_size", info.Size).
-		SetTime(time.Now())
+func WritePacketInfoToDB(info *model.PacketInfo) {
+	writer.Write(TSDBPoint{
+		Measurement: "network_traffic",
+		Tags: map[string]string{
+			"packet_type": info.PacketType,
+			"src_ip":      info.SrcIP,
+			"dst_ip":      info.DstIP,
+			"src_port":    info.SrcPort,
+			"dst_port":    info.DstPort,
+		},
+		Fields: map[string]float64{
+			"packet_size": float64(info.Size),
+		},
+		Timestamp: time.Now(),
+	})
+}
 
-	// Write the point asynchronously
-	writeAPI.WritePoint(p)
+func WritePoint(app storage.Appender, p TSDBPoint) error {
+	ts := p.Timestamp.UnixMilli()
 
-	// Ensure all writes are sent
-	writeAPI.Flush()
+	for field, val := range p.Fields {
+		// encode as "measurement_field" or just "measurement" if single field
+		name := p.Measurement + "_" + field
 
-	go func() {
-		for err := range writeAPI.Errors() {
-			errorChan <- err
+		pairs := []string{"__name__", name}
+		for k, v := range p.Tags {
+			pairs = append(pairs, k, v)
 		}
-	}()
+
+		lbls := labels.FromStrings(pairs...)
+		if _, err := app.Append(0, lbls, ts, val); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

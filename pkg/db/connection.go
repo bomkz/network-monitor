@@ -1,24 +1,23 @@
 package db
 
 import (
-	"os"
+	"log"
 
-	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/prometheus/prometheus/tsdb"
 )
 
-var (
-	influxToken  = os.Getenv("INFLUXDB_ADMIN_TOKEN")
-	influxBucket = os.Getenv("INFLUXDB_BUCKET")
-	influxOrg    = os.Getenv("INFLUXDB_ORG")
-	influxURL    = os.Getenv("INFLUXDB_URL")
-)
-
-var influxClient influxdb2.Client
+var tsdbClient *tsdb.DB
+var writer *TSDBWriter
 
 func init() {
-	influxClient = influxdb2.NewClient(influxURL, influxToken)
+	var err error
+	tsdbClient, err = tsdb.Open("./data.db", nil, nil, tsdb.DefaultOptions(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	writer = NewTSDBWriter(tsdbClient, 1000)
 }
 
-func CloseInfluxDBClient() {
-	influxClient.Close()
+func CloseDBClient() {
+	tsdbClient.Close()
 }
