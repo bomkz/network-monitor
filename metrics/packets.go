@@ -1,13 +1,13 @@
 package metrics
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	"github.com/iliasgal/network-monitor/pkg/model"
+	"github.com/iliasgal/network-monitor/model"
 )
 
 // LayerProcessor defines an interface for processing packet layers
@@ -80,7 +80,8 @@ func PacketCapture() {
 	// Open the device for capturing
 	handle, err := pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		ensureNpCap()
 	}
 	defer handle.Close()
 
