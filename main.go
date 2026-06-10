@@ -5,10 +5,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/iliasgal/network-monitor/db"
-	"github.com/iliasgal/network-monitor/metrics"
+	"github.com/iliasgal/network-monitor/network"
+	"github.com/iliasgal/network-monitor/ui"
 )
 
 func main() {
@@ -17,29 +17,15 @@ func main() {
 	// Notify for SIGINT and SIGTERM
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
-	// Start packet capture in its own goroutine
-	go metrics.PacketCapture()
+	network.InitNet()
 
-	host := "google.com"
-	count := 4
-	ticker := time.NewTicker(5 * time.Second) // Ping every 5 seconds
+	ui.InitUi()
 
-	for {
-		select {
-		case <-ticker.C:
-			pingStats, err := metrics.PingHost(host, count)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			db.WritePingMetricsToDB(pingStats)
-		case info := <-metrics.PacketInfoChan:
-			db.WritePacketInfoToDB(info)
-		case <-signals:
-			log.Println("Termination signal received, closing resources.")
-			db.CloseDBClient()
-			ticker.Stop()
-			return
-		}
-	}
+	go func() {
+		<-signals
+		log.Println("Termination signal received, closing resources.")
+		db.CloseDBClient()
+		os.Exit(0)
+	}()
+
 }

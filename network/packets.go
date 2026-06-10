@@ -1,7 +1,7 @@
-package metrics
+package network
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/gopacket"
@@ -72,16 +72,14 @@ func (p UDPProcessor) Process(packet gopacket.Packet) *model.PacketInfo {
 var PacketInfoChan = make(chan *model.PacketInfo, 100)
 
 func PacketCapture() {
-	device := "en0" // Change this to your network interface name
 	var snapshotLen int32 = 1024
 	var promiscuous bool = false
 	var timeout time.Duration = 30 * time.Second
 
 	// Open the device for capturing
-	handle, err := pcap.OpenLive(device, snapshotLen, promiscuous, timeout)
+	handle, err := pcap.OpenLive(NetDev.Name, snapshotLen, promiscuous, timeout)
 	if err != nil {
-		fmt.Println(err)
-		ensureNpCap()
+		log.Fatal(err)
 	}
 	defer handle.Close()
 

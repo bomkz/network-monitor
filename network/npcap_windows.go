@@ -1,21 +1,49 @@
-package metrics
+package network
 
 import (
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
+	"path/filepath"
+	"syscall"
+
+	"github.com/google/gopacket/pcap"
+	"golang.org/x/sys/windows"
 )
 
 func ensureNpCap() {
+	_, err := pcap.FindAllDevs()
+	if err == nil {
+		return
+	} else if err.Error() != "couldn't load wpcap.dll" {
+		log.Fatal(err)
+	}
+
 	downloadNpCap()
-	cmd := exec.Command("./npcap.exe")
-	if err := cmd.Start(); err != nil {
+
+	npCapAbs, err := filepath.Abs("./npcap.exe")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := launchElevated(npCapAbs); err != nil {
 		log.Fatal("Failed to launch NpCap installer: ", err)
 	}
 	log.Println("NpCap installer launched. Please complete installation and rerun netdiag.")
 	os.Exit(1)
+}
+
+func launchElevated(path string) error {
+	verb, err := syscall.UTF16PtrFromString("runas")
+	if err != nil {
+		return err
+	}
+	exe, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return err
+	}
+	return windows.ShellExecute(0, verb, exe, nil, nil, windows.SW_NORMAL)
 }
 
 func downloadNpCap() {
