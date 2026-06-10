@@ -3,15 +3,16 @@ module github.com/iliasgal/network-monitor
 go 1.25.0
 
 require (
+	fyne.io/fyne/v2 v2.7.4
 	github.com/google/gopacket v1.1.19
 	github.com/prometheus/prometheus v0.312.0
+	golang.org/x/sys v0.45.0
 )
 
 require (
 	cloud.google.com/go/auth v0.20.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
-	fyne.io/fyne/v2 v2.7.4 // indirect
 	fyne.io/systray v1.12.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1 // indirect
@@ -103,7 +104,6 @@ require (
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/api v0.278.0 // indirect

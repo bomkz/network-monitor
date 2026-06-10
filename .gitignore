@@ -29,7 +29,6 @@ node_modules/
 *.iml
 
 # Visual Studio Code
-.vscode/
 *.code-workspace
 
 # Eclipse
@@ -60,3 +59,4 @@ temp/
 .env
 local.Dockerfile
 data.db/
+go.sum
