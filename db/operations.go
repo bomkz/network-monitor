@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/iliasgal/network-monitor/pkg/model"
+	"github.com/iliasgal/network-monitor/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/storage"
 )

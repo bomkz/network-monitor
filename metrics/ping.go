@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/iliasgal/network-monitor/pkg/model"
+	"github.com/iliasgal/network-monitor/model"
 )
 
 // PingHost executes the ping command and calculates average latency, packet loss, and jitter.

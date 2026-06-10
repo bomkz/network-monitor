@@ -7,8 +7,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/iliasgal/network-monitor/pkg/db"
-	"github.com/iliasgal/network-monitor/pkg/metrics"
+	"github.com/iliasgal/network-monitor/db"
+	"github.com/iliasgal/network-monitor/metrics"
 )
 
 func main() {
