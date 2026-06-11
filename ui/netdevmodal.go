@@ -20,7 +20,7 @@ func (v *verticalSepLayout) Layout(objects []fyne.CanvasObject, size fyne.Size) 
 	}
 }
 
-func ChooseNetDev() {
+func netDevModal() {
 	var netList []string
 	for _, x := range network.NetDevs {
 		netList = append(netList, x.Description)
@@ -56,6 +56,7 @@ func ChooseNetDev() {
 			return
 		}
 		modal.Hide()
+		updateInfo <- true
 	})
 
 	leftLabels := container.NewVBox(

@@ -6,15 +6,13 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/driver/desktop"
-	"fyne.io/fyne/v2/widget"
 )
 
 func InitUi() {
 	a = app.New()
-	w = a.NewWindow("Hello Wordle")
+	w = a.NewWindow("NetDiag")
 	w.Resize(fyne.NewSize(900, 600))
-	w.SetContent(widget.NewLabel("wordles r us"))
-	ChooseNetDev()
+	mainWindow()
 
 	var ok bool
 	if desk, ok = a.(desktop.App); ok {
